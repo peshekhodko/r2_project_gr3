@@ -3,27 +3,37 @@ title: "Group 3 R Project 2"
 author: "John Rollman, Mathan Brewer, Nataliya Peshekhodko"
 date: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
-abstract: "This is abstract, will add later"
+abstract: "The main goal of this project involves creating an MCMC sampler for a logistic regression model. To be continued ... "
 
 output: pdf_document
 ---
 
-## R Markdown
+Start this project mostly focused on R code.
+Later, it will be properly brushed up.
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+1. Functions for prior, likelihood and posterior 
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+prior <- function (x) {
+  sigma = 100;
+  return (1/(sigma^2*2*pi)*exp(-(x^2)/(sigma^2)))
+}
 
-```{r cars}
-summary(cars)
+likelihood <- function (y, beta0, beta1, x) {
+  p = 1/(1+exp (-beta0 - beta1*x))
+  return (p^y*(1-p)^(1-y))
+}
+
+posterior <- function (y, beta0, beta1, x) {
+  return (prior(x)*likelihood(y, beta0, beta1, x))
+}
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+
+
+
