@@ -14,9 +14,9 @@ Later, it will be properly brushed up.
 1. Functions for prior, likelihood and posterior 
 
 ```{r}
-prior <- function (x) {
+prior <- function (beta0, beta1) {
   sigma = 100;
-  return (1/(sigma^2*2*pi)*exp(-(x^2)/(sigma^2)))
+  return (1/(sigma^2*2*pi)*exp(-( beta0^(2) + beta1^(2) )/(sigma^2)))
 }
 
 likelihood <- function (y, beta0, beta1, x) {
@@ -25,12 +25,39 @@ likelihood <- function (y, beta0, beta1, x) {
 }
 
 posterior <- function (y, beta0, beta1, x) {
-  return (prior(x)*likelihood(y, beta0, beta1, x))
+  return (prior(beta0, beta1)*likelihood(y, beta0, beta1, x))
 }
 ```
 
 
 
+
+```{r}
+
+thesampler <- function (y, x, n, niter, beta0start, beta1start, beta0proposalsd, beta1proposalsd) {
+  
+  beta0 = rep (0, niter)
+  beta1 = rep (0, niter)
+  
+  beta0[1] = beta0start
+  beta1[1] = beta1start
+  
+  for (i in 2:niter) {
+    currentbeta0 = beta0[i-1]
+    currentbeta1 = beta1[i-1]
+    
+    newbeta0 = currentbeta0 + rnorm (1, 0, beta0proposalsd)
+    
+    
+    
+    
+  }
+  
+  
+  
+}
+
+```
 
 
 
