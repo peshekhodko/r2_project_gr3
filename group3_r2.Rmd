@@ -7,6 +7,11 @@ abstract: "The main goal of this project involves creating an MCMC sampler for a
 
 output: pdf_document
 ---
+```{r}
+library (dplyr)
+#library (MASS)
+```
+
 
 Start this project mostly focused on R code.
 Later, it will be properly brushed up.
@@ -20,8 +25,7 @@ prior <- function (beta0, beta1) {
 }
 
 likelihood <- function (y, beta0, beta1, x) {
-  p = 1/(1+exp (-beta0 - beta1*x))
-  return (p^y*(1-p)^(1-y))
+  return (prod((1/(1+exp (-beta0 - beta1*x)))^(y)*(1-1/(1+exp (-beta0 - beta1*x)))^(1-y)))
 }
 
 posterior <- function (y, beta0, beta1, x) {
@@ -32,7 +36,6 @@ posterior <- function (y, beta0, beta1, x) {
 
 
 ```{r}
-
 thesampler <- function (y, x, n, niter, beta0start, beta1start, beta0proposalsd, beta1proposalsd) {
   
   beta0 = rep (0, niter)
@@ -46,32 +49,57 @@ thesampler <- function (y, x, n, niter, beta0start, beta1start, beta0proposalsd,
     currentbeta1 = beta1[i-1]
     
     newbeta0 = currentbeta0 + rnorm (1, 0, beta0proposalsd)
-    r = posterior(y,newbeta0, currentbeta1, x)/posterior (currentbeta0, currentbeta1, x)
+    r = posterior(y,newbeta0, currentbeta1, x)/posterior (y, currentbeta0, currentbeta1, x)
     
-    if (runif (1) < r)
-      beta0[i] = newbeta0
-    else
-      beta0[i] = currentbeta0
+    
+    if (runif (1) < r){
+      beta0[i] = newbeta0}
+    else{
+      beta0[i] = currentbeta0}
     
     newbeta1 = currentbeta1 + rnorm (1, 0, beta1proposalsd)
-    r = posterior(y,currentbeta0, newbeta1, x)/posterior (currentbeta0, currentbeta1, x)
+    r = posterior(y,currentbeta0, newbeta1, x)/posterior (y, currentbeta0, currentbeta1, x)
     
-    if (runif (1) < r)
-      beta1[i] = newbeta1
-    else
-      beta1[i] = currentbeta1
+    
+    if (runif (1) < r){
+      beta1[i] = newbeta1}
+    else{
+      beta1[i] = currentbeta1}
   }
   
   betas <- data.frame(beta0, beta1)
   names (betas) <- c ("beta0", "beta1")
   return (betas)
-  
 }
+```
+
+Apply to NFL data
+
+```{r}
+nfl<-read.csv(file = "nfl2008_fga.csv") 
+nfl <- select (nfl, distance, GOOD)
+
+
+n=nrow(nfl)
+nfl_draws <- thesampler (nfl$GOOD, nfl$distance, n, 50000, 0, 0,  0.1, 0.1 )
+
+hist (nfl_draws$beta0)
+hist (nfl_draws$beta1)
+
+burnin <- 5000
+
+quantile (c (0.025, 0.975), x = nfl_draws$beta0 [-c(1:burnin)])
+
+quantile (c (0.025, 0.975), x = nfl_draws$beta1 [-c(1:burnin)])
 
 ```
 
+```{r}
 
 
+fit <- glm (GOOD ~ distance, family = binomial (link = 'logit'), data = nfl)
+summary (fit)
 
 
-
+#confit (fit)
+```
