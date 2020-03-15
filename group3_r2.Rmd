@@ -9,7 +9,7 @@ output: pdf_document
 ---
 ```{r}
 library (dplyr)
-#library (MASS)
+library (MASS)
 ```
 
 
@@ -51,7 +51,6 @@ thesampler <- function (y, x, n, niter, beta0start, beta1start, beta0proposalsd,
     newbeta0 = currentbeta0 + rnorm (1, 0, beta0proposalsd)
     r = posterior(y,newbeta0, currentbeta1, x)/posterior (y, currentbeta0, currentbeta1, x)
     
-    
     if (runif (1) < r){
       beta0[i] = newbeta0}
     else{
@@ -59,7 +58,6 @@ thesampler <- function (y, x, n, niter, beta0start, beta1start, beta0proposalsd,
     
     newbeta1 = currentbeta1 + rnorm (1, 0, beta1proposalsd)
     r = posterior(y,currentbeta0, newbeta1, x)/posterior (y, currentbeta0, currentbeta1, x)
-    
     
     if (runif (1) < r){
       beta1[i] = newbeta1}
@@ -77,7 +75,7 @@ Apply to NFL data
 
 ```{r}
 nfl<-read.csv(file = "nfl2008_fga.csv") 
-nfl <- select (nfl, distance, GOOD)
+nfl <- dplyr::select (nfl, distance, GOOD)
 
 
 n=nrow(nfl)
@@ -89,17 +87,11 @@ hist (nfl_draws$beta1)
 burnin <- 5000
 
 quantile (c (0.025, 0.975), x = nfl_draws$beta0 [-c(1:burnin)])
-
 quantile (c (0.025, 0.975), x = nfl_draws$beta1 [-c(1:burnin)])
-
 ```
 
 ```{r}
-
-
 fit <- glm (GOOD ~ distance, family = binomial (link = 'logit'), data = nfl)
 summary (fit)
-
-
-#confit (fit)
+confint (fit)
 ```
