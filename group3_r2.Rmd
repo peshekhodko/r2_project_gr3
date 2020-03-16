@@ -7,27 +7,44 @@ abstract: "The main goal of this project involves creating an MCMC sampler for a
 
 output: pdf_document
 ---
-```{r}
+```{r message=FALSE}
 library (dplyr)
 library (MASS)
 ```
 
 
-Start this project mostly focused on R code.
-Later, it will be properly brushed up.
+### 1. Functions for prior, likelihood and posterior 
 
-1. Functions for prior, likelihood and posterior 
+Based on the assumption that $\beta_0$ and $\beta_1$ each is normally distributed $\sim N(0, 10^2)$, joint distribution could be found as $$f(\beta_{0}, \beta_{1})=\frac{1}{2\pi \sigma^2} e ^{-\frac{1}{2 \sigma^2}(\beta_0^2+\beta_1^2)}$$.
+
+Function for prior
 
 ```{r}
 prior <- function (beta0, beta1) {
   sigma_sq = 100;
-  return (1/(sigma_sq^2*2*pi)*exp(-( beta0^(2) + beta1^(2) )/(sigma_sq^2)))
+  return (  1/(2*sigma_sq^(2)*pi)*exp(-(beta0^(2) + beta1^(2))/(2*sigma_sq^(2))) )
 }
+```
 
+Model 
+$$p(x_i) = \frac{1}{1+e^{-\beta_0-\beta_1x_i}}$$
+The likelihood for the logistic regression model 
+$$L(p) \propto \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}$$
+
+Function for likelihood
+
+```{r}
 likelihood <- function (y, beta0, beta1, x) {
   return (prod((1/(1+exp (-beta0 - beta1*x)))^(y)*(1-1/(1+exp (-beta0 - beta1*x)))^(1-y)))
 }
+```
 
+Posterior distribution 
+$$f_{\beta_0,\beta_1|Y_1,...,Y_n}(\beta_0, \beta_1|y_1,...y_n, x_1,...x_n) \propto L(p)*f(\beta_{0}, \beta_{1}) $$
+
+Function for posterior
+
+```{r}
 posterior <- function (y, beta0, beta1, x) {
   return (prior(beta0, beta1)*likelihood(y, beta0, beta1, x))
 }
