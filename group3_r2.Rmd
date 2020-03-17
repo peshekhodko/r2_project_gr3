@@ -51,7 +51,7 @@ posterior <- function (y, beta0, beta1, x) {
 ```
 
 
-
+Create function for 
 ```{r}
 thesampler <- function (y, x, n, niter, beta0start, beta1start, beta0proposalsd, beta1proposalsd) {
   
@@ -98,10 +98,14 @@ nfl <- dplyr::select (nfl, distance, GOOD)
 n=nrow(nfl)
 nfl_draws <- thesampler (nfl$GOOD, nfl$distance, n, 50000, 0, 0,  0.1, 0.1 )
 
-hist (nfl_draws$beta0)
-hist (nfl_draws$beta1)
-
 burnin <- 5000
+
+par(mfrow=c(2,2))
+hist (nfl_draws$beta0, main = "Beta0 without burnin")
+hist (nfl_draws$beta1, main = "Beta1 without burnin")
+hist (nfl_draws$beta0 [-c(1:burnin)], main = "Beta0 with burnin")
+hist (nfl_draws$beta1 [-c(1:burnin)], main = "Beta1 with burnin")
+
 
 quantile (c (0.025, 0.975), x = nfl_draws$beta0 [-c(1:burnin)])
 quantile (c (0.025, 0.975), x = nfl_draws$beta1 [-c(1:burnin)])
@@ -111,4 +115,6 @@ quantile (c (0.025, 0.975), x = nfl_draws$beta1 [-c(1:burnin)])
 fit <- glm (GOOD ~ distance, family = binomial (link = 'logit'), data = nfl)
 summary (fit)
 confint (fit)
+
+#plot (fit)
 ```
