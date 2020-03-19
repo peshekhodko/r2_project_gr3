@@ -3,17 +3,20 @@ title: "Group 3 R Project 2"
 author: "John Rollman, Mathan Brewer, Nataliya Peshekhodko"
 date: '`r format(Sys.Date(), "%Y-%B-%d")`'
 
-abstract: "The main goal of this project involves creating an MCMC sampler for a logistic regression model. To be continued ... "
+abstract: "The main goal of this project involves creating an MCMC sampler for a logistic regression model and then applying MCMC sampler to NFL data. Credible intervals for parameters will be created using MCMC sampler and through logistic regression model fitting."
 
 output: pdf_document
 ---
+
+### Functions for prior, likelihood and posterior 
+
 ```{r message=FALSE}
 library (dplyr)
 library (MASS)
 ```
 
 
-### 1. Functions for prior, likelihood and posterior 
+First, create functions for prior, likelihood and posterior for joint $\beta_0$, $\beta_1$ distribution including covariate variable. 
 
 Based on the assumption that $\beta_0$ and $\beta_1$ each is normally distributed $\sim N(0, 10^2)$, joint distribution could be found as $$f(\beta_{0}, \beta_{1})=\frac{1}{2\pi \sigma^2} e ^{-\frac{1}{2 \sigma^2}(\beta_0^2+\beta_1^2)}$$.
 
@@ -26,7 +29,7 @@ prior <- function (beta0, beta1) {
 }
 ```
 
-Model 
+Model with covariate variable
 $$p(x_i) = \frac{1}{1+e^{-\beta_0-\beta_1x_i}}$$
 The likelihood for the logistic regression model 
 $$L(p) \propto \prod_{i=1}^n p(x_i)^{y_i}(1-p(x_i))^{1-y_i}$$
@@ -50,6 +53,7 @@ posterior <- function (y, beta0, beta1, x) {
 }
 ```
 
+### Sampler function
 
 Create function for 
 ```{r}
@@ -88,7 +92,9 @@ thesampler <- function (y, x, n, niter, beta0start, beta1start, beta0proposalsd,
 }
 ```
 
-Apply to NFL data
+### Applying to NFL data
+
+Read NFL data and select only distance and "good" result columns 
 
 ```{r}
 nfl<-read.csv(file = "nfl2008_fga.csv") 
