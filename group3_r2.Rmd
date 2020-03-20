@@ -13,6 +13,7 @@ output: pdf_document
 ```{r message=FALSE}
 library (dplyr)
 library (MASS)
+library(TeachingDemos)
 ```
 
 
@@ -25,7 +26,7 @@ Function for prior
 ```{r}
 prior <- function (beta0, beta1) {
   sigma_sq = 100;
-  return (  1/(2*sigma_sq^(2)*pi)*exp(-(beta0^(2) + beta1^(2))/(2*sigma_sq^(2))) )
+  return (  1/(2*sigma_sq*pi)*exp(-(beta0^(2) + beta1^(2))/(2*sigma_sq) ) )
 }
 ```
 
@@ -100,7 +101,11 @@ Read NFL data and select only distance and "good" result columns
 nfl<-read.csv(file = "nfl2008_fga.csv") 
 nfl <- dplyr::select (nfl, distance, GOOD)
 
+```
 
+Applying 
+
+```{r}
 n=nrow(nfl)
 nfl_draws <- thesampler (nfl$GOOD, nfl$distance, n, 50000, 0, 0,  0.1, 0.1 )
 
@@ -115,6 +120,7 @@ hist (nfl_draws$beta1 [-c(1:burnin)], main = "Beta1 with burnin")
 
 quantile (c (0.025, 0.975), x = nfl_draws$beta0 [-c(1:burnin)])
 quantile (c (0.025, 0.975), x = nfl_draws$beta1 [-c(1:burnin)])
+
 ```
 
 ```{r}
@@ -124,3 +130,6 @@ confint (fit)
 
 #plot (fit)
 ```
+
+### Conclusion
+
