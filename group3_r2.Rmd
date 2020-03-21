@@ -128,7 +128,7 @@ fit <- glm (GOOD ~ distance, family = binomial (link = 'logit'), data = nfl)
 summary (fit)
 confint (fit)
 
-#plot (fit)
+plot (fit)
 ```
 
 ### Conclusion
